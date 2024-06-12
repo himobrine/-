@@ -1,0 +1,92 @@
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+
+public class LoginProgram2 {
+    private static HashMap<String, String> users = new HashMap<>();
+
+    public static void main(String[] args) {
+        users.put("wrhklm", "403fd30776d96e03580cd598a1c2988e6f217103fe2cf044fbebcd3ef874a8b9");
+        //XXXXXX{vXXXX27yXXXX9heXXXnb}
+        //System.out.println(hashPassword("password"));
+        JFrame frame = new JFrame("Login");
+        frame.setSize(300, 150);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+
+        // 创建面板
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        placeComponents(panel);
+
+        // 显示框架
+        frame.setVisible(true);
+    }
+
+    private static void placeComponents(JPanel panel) {
+        panel.setLayout(null);
+
+        // 用户名标签
+        JLabel userLabel = new JLabel("User:");
+        userLabel.setBounds(10, 20, 80, 25);
+        panel.add(userLabel);
+
+        // 用户名输入框
+        JTextField userText = new JTextField(20);
+        userText.setBounds(100, 20, 165, 25);
+        panel.add(userText);
+
+        // 密码标签
+        JLabel passwordLabel = new JLabel("Password:");
+        passwordLabel.setBounds(10, 50, 80, 25);
+        panel.add(passwordLabel);
+
+        // 密码输入框
+        JPasswordField passwordText = new JPasswordField(20);
+        passwordText.setBounds(100, 50, 165, 25);
+        panel.add(passwordText);
+
+        // 登录按钮
+        JButton loginButton = new JButton("Login");
+        loginButton.setBounds(10, 80, 80, 25);
+        panel.add(loginButton);
+
+        // 登录按钮事件
+        loginButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String username = userText.getText();
+                String password = new String(passwordText.getPassword());
+
+                if (authenticate(username, password)) {
+                    JOptionPane.showMessageDialog(panel, "Login successful");
+                } else {
+                    JOptionPane.showMessageDialog(panel, "Invalid username or password");
+                }
+            }
+        });
+    }
+
+    private static boolean authenticate(String username, String password) {
+        String hashedPassword = hashPassword(password);
+        return users.containsKey(username) && users.get(username).equals(hashedPassword);
+    }
+
+    private static String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
